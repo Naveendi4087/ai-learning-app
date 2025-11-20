@@ -22,7 +22,7 @@ def ask_ai(prompt, language="text"):
             {"role": "system", "content": system_message},
             {"role": "user", "content": prompt}
         ],
-        max_tokens=1000,
+        max_tokens=400,
         temperature=0.5,
     )
     

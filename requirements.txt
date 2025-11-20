@@ -1,3 +1,9 @@
 streamlit
 openai
 python-dotenv
+psycopg2-binary
+google-generativeai
+numpy
+pandas
+plotly
+catsim

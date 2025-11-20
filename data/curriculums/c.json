@@ -1,0 +1,31 @@
+{
+  "subject": "C",
+  "knowledge_units": [
+    {"code": "C_SDF", "name": "Syntax & Data Fundamentals", "description": "Basic syntax, variables, data types, and operators."},
+    {"code": "C_CS", "name": "Control Structures", "description": "Logic flow using if-else, switch, and loops."},
+    {"code": "C_F", "name": "Functions", "description": "Defining and calling functions, scope, and parameters."},
+    {"code": "C_ADP", "name": "Arrays, Pointers & Strings", "description": "Managing data collections, memory addresses, and text."},
+    {"code": "C_MM", "name": "Memory Management", "description": "Dynamic memory allocation with malloc and free."},
+    {"code": "C_DS", "name": "Data Structures", "description": "Creating complex data types with structs and unions."},
+    {"code": "C_IO", "name": "File I/O", "description": "Reading from and writing to files."}
+  ],
+  "topics": [
+    {"ku_code": "C_SDF", "name": "Introduction to C", "order": 1},
+    {"ku_code": "C_SDF", "name": "Variables and Data Types", "order": 2},
+    {"ku_code": "C_SDF", "name": "Operators", "order": 3},
+    {"ku_code": "C_SDF", "name": "Input/Output (printf/scanf)", "order": 4},
+    {"ku_code": "C_CS", "name": "Control Flow (if, else, switch)", "order": 5},
+    {"ku_code": "C_CS", "name": "While Loops", "order": 6},
+    {"ku_code": "C_CS", "name": "For Loops", "order": 7},
+    {"ku_code": "C_F", "name": "Function Declaration and Definition", "order": 8},
+    {"ku_code": "C_F", "name": "Function Parameters and Return Values", "order": 9},
+    {"ku_code": "C_F", "name": "Scope and Lifetime", "order": 10},
+    {"ku_code": "C_ADP", "name": "Arrays", "order": 11},
+    {"ku_code": "C_ADP", "name": "Pointers", "order": 12},
+    {"ku_code": "C_ADP", "name": "Strings", "order": 13},
+    {"ku_code": "C_ADP", "name": "Pointers and Arrays", "order": 14},
+    {"ku_code": "C_MM", "name": "Dynamic Memory Allocation (malloc/free)", "order": 15},
+    {"ku_code": "C_DS", "name": "Structs and Unions", "order": 16},
+    {"ku_code": "C_IO", "name": "File I/O (fopen, fclose, etc.)", "order": 17}
+  ]
+}

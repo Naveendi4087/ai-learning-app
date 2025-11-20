@@ -1,118 +1,202 @@
 import streamlit as st
-from modules import llm, db, helpers
-import json
-import re
+from modules import db, helpers, psychometrics, curriculum
+import numpy as np
+# *** Import the component classes for direct method calling in 0.17.3 ***
+from catsim.selection import MaxInfoSelector 
+from catsim.estimation import NumericalSearchEstimator 
 
 helpers.set_page_styling()
 
-LEARNING_PATH_PAGE = "pages/3_Learning_Path.py"
-PROFILE_PAGE = "pages/5_Profile.py"
+st.set_page_config(page_title="Final Assessment", page_icon="🏆", layout="centered")
 
-st.set_page_config(page_title="Assignments", page_icon="📝", layout="centered")
 if 'user_id' not in st.session_state or 'selected_subject' not in st.session_state:
     st.page_link("pages/0_Login.py", label="Go to Login", icon="🔑")
     st.stop()
 
 subject = st.session_state['selected_subject']
-st.title(f"📝 Final Assignments for {subject}")
+user_id = st.session_state['user_id']
+st.title(f"🏆 Final Assessment for {subject}")
 
-progress = db.get_or_create_progress(st.session_state['user_id'], subject)
+progress = db.get_or_create_progress(user_id, subject)
 
 if progress['status'] == 'completed':
     st.success(f"You have already mastered the {subject} module!")
-    st.metric(label="Your Final Score", value=f"{progress['assignment_score']}%")
-    st.page_link(PROFILE_PAGE, label="View Your Profile", icon="👤")
+    st.metric(label="Your Final Ability Score (Theta)", value=f"{progress['irt_theta_final']:.3f}")
+    st.metric(label="Learning Gain (Theta)", value=f"{(progress['irt_theta_final'] - progress['irt_theta_initial']):.3f}")
+    st.page_link("pages/5_Profile.py", label="View Your Profile", icon="👤")
     st.stop()
 
-if progress['assignment_score'] is not None and progress['status'] == 'learning':
-    st.warning(f"Your previous score was {progress['assignment_score']}%. Review the lessons and try again when you're ready.")
-    if st.button("Try a New Assignment", type="primary"):
-        db.update_progress(st.session_state['user_id'], subject, status='assessing')
+if progress['irt_theta_final'] is not None and progress['status'] == 'learning':
+    st.warning(f"Your previous final score was {progress['irt_theta_final']:.3f}. Review the lessons and try again when you're ready.")
+    if st.button("Try a New Assessment", type="primary"):
+        db.update_progress(user_id, subject, status='assessing')
         st.rerun()
-    st.page_link(LEARNING_PATH_PAGE, label="Go to Review Mode", icon="📖")
+    st.page_link("pages/3_Learning_Path.py", label="Go to Review Mode", icon="📚")
     st.stop()
 
 if progress['status'] != 'assessing':
-    st.info("You must complete the learning path before taking the final assignment.")
-    st.page_link(LEARNING_PATH_PAGE, label="Back to Learning Path")
+    st.info("You must complete the learning path before taking the final assessment.")
+    st.page_link("pages/3_Learning_Path.py", label="Back to Learning Path")
     st.stop()
 
-if 'assignment_questions' not in st.session_state:
-    if st.button("Generate Your Assignment", type="primary", use_container_width=True):
-        with st.spinner("Generating your assignment..."):
-            # Full, detailed, few-shot prompt
-            prompt = f"""
-            Generate 3 diverse MULTIPLE-CHOICE questions for a {subject} assignment, covering beginner, intermediate, and advanced topics.
+# --- CAT SIMULATOR INITIALIZATION ---
+if 'cat_simulator_final' not in st.session_state:
+    with st.spinner("Loading calibrated final exam..."):
+        item_bank, item_map = psychometrics.get_irt_question_bank(subject, 'final')
+        
+        if item_bank is None or len(item_bank) < 20:
+            st.error("No final exam bank found or not enough items. Cannot start assessment.")
+            st.stop()
+            
+        TEST_LENGTH = 20 
 
-            **CRITICAL INSTRUCTIONS:**
-            1. All questions MUST be multiple-choice with 4 options.
-            2. If a question refers to a code snippet, that snippet MUST be embedded directly within the 'question' string using Markdown code fences (```c ... ```).
-            3. Return a SINGLE, valid JSON array where each element is an object with keys "question", "options", "correct_answer", and "related_topic".
-            4. Provide ONLY the JSON array, with no other text.
+        st.session_state.cat_simulator_final = psychometrics.initialize_cat_simulator(item_bank, TEST_LENGTH)
+        st.session_state.cat_item_map_final = item_map
+        st.session_state.cat_item_bank_final = item_bank
+        
+        # Initialize lists
+        st.session_state.cat_administered_items_final = []
+        st.session_state.cat_responses_final = []
+        
+        # Initialize theta based on initial score
+        initial_theta = progress['irt_theta_initial'] or 0.0
+        st.session_state.cat_current_theta_final = initial_theta
+        
+        st.session_state.cat_current_item_index_final = None
 
-            **EXAMPLE of a perfect response format:**
-            [
-              {{
-                "question": "What is the output of the following C code?\\n```c\\n#include <stdio.h>\\nint main() {{ int x = 10; printf(\\"%d\\", x++); return 0; }}\\n```",
-                "options": ["10", "11", "12", "Compilation Error"],
-                "correct_answer": "10",
-                "related_topic": "Operators"
-              }},
-              {{
-                "question": "Which function is used to allocate memory for an array in C?",
-                "options": ["malloc", "calloc", "realloc", "free"],
-                "correct_answer": "calloc",
-                "related_topic": "Memory Management"
-              }}
-            ]
-            """
-            response = llm.ask_ai(prompt, language=subject)
-            try:
-                json_match = re.search(r'\[.*\]', response, re.DOTALL)
-                if json_match:
-                    json_string = json_match.group(0)
-                    st.session_state.assignment_questions = json.loads(json_string)
-                    st.rerun()
-                else:
-                    st.error("Could not find a valid JSON array in the AI's response."); st.code(response)
-            except json.JSONDecodeError:
-                st.error("Failed to decode the JSON from the AI's response."); st.code(response)
-    st.stop()
+# --- RUN THE TEST ---
+simulator = st.session_state.cat_simulator_final
+item_map = st.session_state.cat_item_map_final
+item_bank = st.session_state.cat_item_bank_final
 
-questions = st.session_state.assignment_questions
-user_answers = {}
+q_num = len(st.session_state.cat_administered_items_final) + 1
+# Use max_itens for catsim 0.17.3
+TEST_LENGTH = simulator.stopper.max_itens 
 
-st.info("Answer the following questions to complete your assessment.")
-with st.form("assignment_form"):
-    for i, q in enumerate(questions):
-        if isinstance(q, dict) and all(key in q for key in ['question', 'options', 'correct_answer', 'related_topic']):
-             st.markdown(f"**Question {i+1}:** {q['question']}")
-             user_answers[i] = st.radio("Options:", q['options'], key=f"assign_{i}", index=None)
+test_is_complete = q_num > TEST_LENGTH
+
+if not test_is_complete:
+    st.header(f"Question {q_num} of {TEST_LENGTH}")
+    
+    # 1. Select the next item
+    if st.session_state.cat_current_item_index_final is None:
+        theta_estimate = st.session_state.cat_current_theta_final
+        
+        administered_indices = [idx for idx, r in st.session_state.cat_administered_items_final]
+        
+        #
+        # Use KEYWORD ARGUMENTS for independence check to pass
+        #
+        next_item_sim_index = MaxInfoSelector.select(
+            simulator.selector, # The 'self' instance
+            items=item_bank,
+            administered_items=administered_indices, 
+            est_theta=theta_estimate
+        )
+        st.session_state.cat_current_item_index_final = next_item_sim_index
+    
+    # 2. Display the item
+    item_sim_index = st.session_state.cat_current_item_index_final
+    item_data = item_map[item_sim_index]
+    
+    st.markdown(f"**Topic:** {item_data['topic_id']}") 
+    st.markdown(item_data['question_text'])
+    
+    options = item_data['options']
+    
+    with st.form(key=f"cat_final_q_{item_sim_index}"):
+        user_choice_idx = st.radio(
+            "Select your answer:",
+            options=options,
+            index=None,
+            format_func=lambda x: x,
+            label_visibility="collapsed"
+        )
+        submitted = st.form_submit_button("Submit Answer")
+
+    if submitted:
+        if user_choice_idx is None:
+            st.warning("Please select an answer.")
         else:
-            st.warning(f"Question {i+1} is not formatted correctly and will be skipped."); user_answers[i] = None
-    submitted = st.form_submit_button("Submit Final Assignment")
-
-if submitted:
-    score = 0
-    wrong_answers_topics = []
-    valid_questions = [q for i, q in enumerate(questions) if user_answers[i] is not None]
-    for i, q in enumerate(valid_questions):
-        if user_answers[i] == q['correct_answer']:
-            score += 1
-        else: wrong_answers_topics.append(q['related_topic'])
-    score_percent = int((score / len(valid_questions)) * 100) if valid_questions else 0
-    if score_percent >= 80:
-        st.success(f"### Congratulations! You passed with a score of {score_percent}%.")
-        db.update_progress(st.session_state['user_id'], subject, status='completed', score=score_percent)
-        st.page_link(PROFILE_PAGE, label="View Your Profile")
+            # 3. Process the response
+            response_idx = options.index(user_choice_idx)
+            is_correct = (response_idx == item_data['correct_option_index'])
+            
+            st.session_state.cat_administered_items_final.append((item_sim_index, is_correct))
+            st.session_state.cat_responses_final.append(is_correct)
+            
+            # Extract administered indices AND responses
+            administered_indices = [idx for idx, r in st.session_state.cat_administered_items_final]
+            responses = [r for idx, r in st.session_state.cat_administered_items_final]
+            
+            #
+            # Use KEYWORD ARGUMENTS for independence check to pass
+            # NumericalSearchEstimator.estimate(self, items, administered_items, response_vector, est_theta, **kwargs)
+            #
+            theta_estimate = NumericalSearchEstimator.estimate(
+                simulator.estimator, # The 'self' instance
+                items=item_bank,
+                administered_items=administered_indices,
+                response_vector=responses,
+                est_theta=st.session_state.cat_current_theta_final
+            )
+            st.session_state.cat_current_theta_final = float(theta_estimate)
+            
+            # Log to DB
+            psychometrics.log_cat_response(
+                user_id, 
+                item_data['id'], 
+                'final', 
+                response_idx, 
+                bool(is_correct), 
+                float(theta_estimate)
+            )
+            
+            # --- NEW: BKT Update for Final Exam ---
+            db.update_bkt_model(user_id, subject, item_data['topic_id'], is_correct)
+            
+            st.session_state.cat_current_item_index_final = None
+            st.rerun()
+else:
+    # --- TEST IS COMPLETE ---
+    st.success("🎉 Final Assessment Complete!")
+    
+    final_theta = st.session_state.cat_current_theta_final
+    initial_theta = progress['irt_theta_initial'] or 0.0
+    learning_gain = final_theta - initial_theta
+    
+    st.metric("Your Final Ability Estimate (Theta)", f"{final_theta:.3f}")
+    st.metric("Your Initial Ability Estimate (Theta)", f"{initial_theta:.3f}")
+    st.metric("Total Learning Gain", f"{learning_gain:+.3f}")
+    
+    # --- Gap Analysis 2.0 ---
+    PASSING_THRESHOLD_THETA = 1.0
+    
+    if final_theta >= PASSING_THRESHOLD_THETA and learning_gain > 0:
+        st.success("### Congratulations! You passed and demonstrated significant learning.")
+        st.balloons()
+        db.update_progress(user_id, subject, irt_theta_final=final_theta, status='completed')
+        st.page_link("pages/5_Profile.py", label="View Your Profile")
     else:
-        st.error(f"### Your score is {score_percent}%. You need more practice.")
-        db.update_progress(st.session_state['user_id'], subject, status='learning', score=score_percent)
-        if wrong_answers_topics:
-            with st.spinner("Analyzing your results..."):
-                topics_str = ", ".join(set(wrong_answers_topics))
-                feedback_prompt = f"A student needs to improve their understanding of these {subject} topics: {topics_str}. Briefly and encouragingly explain what they should focus on when reviewing these topics."
-                feedback = llm.ask_ai(feedback_prompt, language=subject)
-                st.warning("💡 AI Tutor Feedback: What to Focus On"); st.info(feedback)
-        st.page_link(LEARNING_PATH_PAGE, label="Go to Review Mode", icon="📖")
-    if 'assignment_questions' in st.session_state: del st.session_state.assignment_questions
+        st.error(f"### Your final ability score is {final_theta:.3f}. You need more practice.")
+        db.update_progress(user_id, subject, irt_theta_final=final_theta, status='learning')
+        
+        with st.spinner("Analyzing your results and generating feedback..."):
+            summary = db.get_student_model_summary(user_id, subject)
+            if isinstance(summary, list):
+                weak_topics = sorted([s for s in summary if s['prob_knows'] < 0.7], key=lambda x: x['prob_knows'])
+                
+                if weak_topics:
+                    st.warning("AI Tutor Feedback: What to Focus On")
+                    st.write("Our analysis shows you should focus on the following topics:")
+                    for t in weak_topics:
+                        st.markdown(f"- **{t['topic_name']}** (Current Mastery: {t['prob_knows']*100:.0f}%)")
+                else:
+                    st.info("Your mastery profile looks strong, but you haven't yet reached the passing threshold. Keep reviewing!")
+
+        st.page_link("pages/3_Learning_Path.py", label="Go to Review Mode", icon="📚")
+    
+    # Clean up session state
+    keys_to_delete = [k for k in st.session_state if k.startswith('cat_')]
+    for k in keys_to_delete:
+        del st.session_state[k]

@@ -1,0 +1,66 @@
+[
+  {
+    "subject": "C",
+    "topic_name": "Introduction to C",
+    "bloom_level": "Explain",
+    "intention_type": "Lesson",
+    "content": "### Welcome to C Programming\n\nC is a general-purpose, procedural computer programming language supporting structured programming, lexical variable scope, and recursion, with a static type system. By design, C provides constructs that map efficiently to typical machine instructions.\n\n**Why Learn C?**\n1. **Foundation:** It is the base for many languages like C++, Java, and Python.\n2. **Performance:** It is used in Operating Systems and Embedded Systems.\n\n**Structure of a C Program:**\n```c\n#include <stdio.h> // Header file\n\n// Main function - entry point\nint main() {\n    printf(\"Hello, World!\"); // Output\n    return 0; // Exit status\n}\n```",
+    "author_notes": "Introductory material."
+  },
+  {
+    "subject": "C",
+    "topic_name": "Variables and Data Types",
+    "bloom_level": "Explain",
+    "intention_type": "Lesson",
+    "content": "### Variables and Data Types\n\nIn C, variables are containers for storing data values. Each variable must be declared with a specific type.\n\n**Basic Data Types:**\n* `int`: Integers (e.g., 5, -10). Format specifier: `%d`\n* `float`: Floating point numbers (e.g., 3.14). Format specifier: `%f`\n* `char`: Single characters (e.g., 'A'). Format specifier: `%c`\n\n**Declaration:**\n```c\nint myAge = 25;\nfloat height = 5.9;\nchar grade = 'A';\n```\n\n**Note:** C is statically typed, meaning you cannot change the type of a variable once declared.",
+    "author_notes": "Focus on int, float, char."
+  },
+  {
+    "subject": "C",
+    "topic_name": "Control Flow (if, else, switch)",
+    "bloom_level": "Explain",
+    "intention_type": "Lesson",
+    "content": "### Control Flow\n\nControl flow statements allow you to make decisions in your code.\n\n**If-Else:**\n```c\nif (age >= 18) {\n    printf(\"Adult\");\n} else {\n    printf(\"Minor\");\n}\n```\n\n**Switch Statement:**\nUsed to select one of many code blocks to be executed.\n```c\nswitch(day) {\n  case 1:\n    printf(\"Monday\");\n    break; // Important to stop execution!\n  case 2:\n    printf(\"Tuesday\");\n    break;\n  default:\n    printf(\"Weekend\");\n}\n```",
+    "author_notes": "Emphasize the break statement in switch."
+  },
+  {
+    "subject": "C",
+    "topic_name": "Pointers",
+    "bloom_level": "Explain",
+    "intention_type": "Lesson",
+    "content": "### Introduction to Pointers\n\nA pointer is a variable whose value is the **address** of another variable. They are powerful features of C used for dynamic memory allocation and array manipulation.\n\n**Syntax:**\n* `&`: Address-of operator (Get the address).\n* `*`: Dereference operator (Get the value at address).\n\n```c\nint myNum = 10;\nint *ptr = &myNum; // ptr holds the address of myNum\n\nprintf(\"%p\", ptr); // Prints memory address\nprintf(\"%d\", *ptr); // Prints 10 (Dereferencing)\n```\n\n**Warning:** Always initialize pointers. Using uninitialized pointers leads to crashes.",
+    "author_notes": "Pointers are hard; keep it simple."
+  },
+  {
+    "subject": "Python",
+    "topic_name": "Introduction to Python",
+    "bloom_level": "Explain",
+    "intention_type": "Lesson",
+    "content": "### Welcome to Python\n\nPython is a high-level, interpreted programming language known for its readability and versatility. It is widely used in Web Development, Data Science, and AI.\n\n**Key Features:**\n1. **Readable:** Uses indentation instead of braces `{}`.\n2. **Interpreted:** Runs code line-by-line.\n3. **Dynamic:** No need to declare variable types.\n\n**Your First Program:**\n```python\nprint(\"Hello, World!\")\n```\n\nUnlike C, there is no `main()` function required for simple scripts.",
+    "author_notes": "Contrast with C."
+  },
+  {
+    "subject": "Python",
+    "topic_name": "Variables and Types",
+    "bloom_level": "Explain",
+    "intention_type": "Lesson",
+    "content": "### Variables in Python\n\nPython variables are created the moment you assign a value to them. You do not need to declare a type.\n\n**Examples:**\n```python\nx = 5          # int\ny = \"Hello\"    # str\nz = 3.14       # float\n```\n\n**Casting:**\nIf you need to specify a type, you can use casting:\n```python\nx = str(3)    # x will be '3'\ny = int(3.8)  # y will be 3\n```\n\n**Type Checking:**\nUse the `type()` function to verify: `print(type(x))`.",
+    "author_notes": "Highlight dynamic typing."
+  },
+  {
+    "subject": "Python",
+    "topic_name": "Lists and Tuples",
+    "bloom_level": "Explain",
+    "intention_type": "Lesson",
+    "content": "### Lists and Tuples\n\nPython provides powerful ways to store collections of data.\n\n**Lists (Mutable):**\nLists are ordered and changeable. Created with `[]`.\n```python\nfruits = [\"apple\", \"banana\", \"cherry\"]\nfruits[1] = \"mango\" # Valid\nfruits.append(\"orange\")\n```\n\n**Tuples (Immutable):**\nTuples are ordered and unchangeable. Created with `()`.\n```python\ncolors = (\"red\", \"green\", \"blue\")\n# colors[1] = \"yellow\" # ERROR: Cannot modify tuple\n```\n\nUse Lists for data that changes, and Tuples for fixed data.",
+    "author_notes": "Focus on mutability difference."
+  },
+  {
+    "subject": "Python",
+    "topic_name": "Dictionaries",
+    "bloom_level": "Explain",
+    "intention_type": "Lesson",
+    "content": "### Python Dictionaries\n\nDictionaries store data values in `key:value` pairs. They are ordered (as of Python 3.7), changeable, and do not allow duplicates.\n\n**Syntax:**\n```python\nstudent = {\n  \"name\": \"John\",\n  \"age\": 21,\n  \"course\": \"Computer Engineering\"\n}\n```\n\n**Accessing Items:**\n```python\nprint(student[\"name\"]) # Output: John\nprint(student.get(\"age\"))\n```\n\n**Adding/Modifying:**\n```python\nstudent[\"gpa\"] = 3.8 # Add new key\nstudent[\"age\"] = 22  # Update existing key\n```",
+    "author_notes": "Explain Key-Value pairs."
+  }
+]

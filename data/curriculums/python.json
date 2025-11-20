@@ -1,0 +1,15 @@
+{
+  "subject": "Python",
+  "knowledge_units": [
+    {"code": "PY_BAS", "name": "Python Basics", "description": "Syntax, variables, and basic IO."},
+    {"code": "PY_DS", "name": "Data Structures", "description": "Lists, Dictionaries, Tuples, and Sets."},
+    {"code": "PY_OOP", "name": "Object Oriented Programming", "description": "Classes and Objects."}
+  ],
+  "topics": [
+    {"ku_code": "PY_BAS", "name": "Introduction to Python", "order": 1},
+    {"ku_code": "PY_BAS", "name": "Variables and Types", "order": 2},
+    {"ku_code": "PY_DS", "name": "Lists and Tuples", "order": 3},
+    {"ku_code": "PY_DS", "name": "Dictionaries", "order": 4},
+    {"ku_code": "PY_OOP", "name": "Classes and Objects", "order": 5}
+  ]
+}

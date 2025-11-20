@@ -1,5 +1,8 @@
 import streamlit as st
 from modules import auth, db, helpers
+from dotenv import load_dotenv 
+
+load_dotenv() 
 
 helpers.set_page_styling()
 helpers.hide_sidebar()
@@ -12,10 +15,13 @@ load_page_css()
 
 # --- PAGE CONFIGURATION ---
 st.set_page_config(
-    page_title="Welcome - AI Learning Agent", page_icon="📘", layout="wide", initial_sidebar_state="collapsed")
+    page_title="Welcome - AI Learning Agent", page_icon="🤖", layout="wide", initial_sidebar_state="collapsed")
 
 # --- DATABASE & REDIRECT ---
-db.create_tables() 
+conn = db.get_db_connection()
+db.create_tables(conn) 
+conn.close() 
+
 if 'user_id' in st.session_state:
     st.switch_page("pages/1_Home.py")
 
@@ -77,7 +83,7 @@ with right_col:
         with col_text:
             st.markdown("<p style='text-align: right; margin-top: 10px;'>Don't have an account?</p>", unsafe_allow_html=True)
         with col_btn:
-            if st.button("👉 Sign Up", key="switch-to-signup", type="secondary"):
+            if st.button("🚀 Sign Up", key="switch-to-signup", type="secondary"):
                 st.session_state.form_view = 'signup'
                 st.rerun()
 
@@ -106,6 +112,6 @@ with right_col:
         with col_text:
             st.markdown("<p style='text-align: right; margin-top: 10px;'>Already have an account?</p>", unsafe_allow_html=True)
         with col_btn:
-            if st.button("👉 Login", key="switch-to-login", type="secondary"):
+            if st.button("👋 Login", key="switch-to-login", type="secondary"):
                 st.session_state.form_view = 'login'
                 st.rerun()
