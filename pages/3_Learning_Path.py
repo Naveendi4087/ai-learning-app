@@ -78,11 +78,11 @@ st.sidebar.header("Course Outline")
 # --- ICON LEGEND ---
 with st.sidebar.expander("ℹ️ Icon Legend", expanded=False):
     st.markdown("""
-    🔒 : **Locked** (Complete previous topic first)
-    📖 : **Unlocked** (Ready to learn)
-    ▶️ : **Current** (You are here)
-    ✅ : **Fully Mastered** (Score > 95%)
-    """)
+- 🔒 : **Locked** (Complete previous topic first)
+- 📖 : **Unlocked** (Ready to learn)
+- ▶️ : **Current** (You are here)
+- ✅ : **Fully Mastered** (Score > 95%)
+""")
 # -----------------------
 
 for topic_record in learning_path:

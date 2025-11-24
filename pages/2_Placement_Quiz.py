@@ -56,7 +56,7 @@ if 'cat_simulator' not in st.session_state:
             st.stop()
             
         # ***  Change test length to match available items ***
-        TEST_LENGTH = 4 # Changed from 10 to 4
+        TEST_LENGTH = 10 # Changed from 10 to 4
         
         if len(item_bank) < TEST_LENGTH:
             st.error(f"Not enough items in bank ({len(item_bank)}) to run a {TEST_LENGTH}-item test.")
