@@ -38,7 +38,8 @@ if progress['irt_theta_initial'] is not None:
     final_theta = progress['irt_theta_initial']
     level = get_ability_level(final_theta)
     
-    st.metric("Your Starting Knowledge Level", level, delta=f"Theta: {final_theta:.3f}")
+    # MODIFICATION 1: Remove Theta from st.metric delta
+    st.metric("Your Starting Knowledge Level", level) 
     
     st.page_link("pages/3_Learning_Path.py", label="Continue Your Learning Path", icon="📚")
     st.stop()
@@ -172,8 +173,8 @@ else:
     final_theta = st.session_state.cat_current_theta
     level = get_ability_level(final_theta) # Get level for final display
     
-    # *** Display proficiency level ***
-    st.metric("Your Starting Knowledge Level", level, delta=f"Theta: {final_theta:.3f}")
+    # *** Display proficiency level***
+    st.metric("Your Starting Knowledge Level", level)
     
     with st.spinner("Seeding your personalized 'Student Brain' (BKT Model)..."):
         # The "Psychometric Hand-off"
@@ -190,7 +191,6 @@ else:
         if path:
             st.session_state.current_topic_id = path[0]['id']
             
-    # *** Display probability and level ***
     st.info(f"We've analyzed your results and set your initial knowledge profile. You are assessed as **{level}** with a starting mastery probability of {initial_prob_knows*100:.0f}%.")
     st.page_link("pages/3_Learning_Path.py", label="Start Your Learning Path!", icon="🚀")
     

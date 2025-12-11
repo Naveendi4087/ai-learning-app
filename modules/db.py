@@ -54,6 +54,8 @@ def create_tables(conn): # <--- Accepts 'conn'
             topic_index INTEGER DEFAULT 0, -- This is now legacy, BKT is primary
             status TEXT DEFAULT 'learning', -- learning, assessing, completed
             assignment_score INTEGER,
+
+            final_assessment_attempts INTEGER DEFAULT 0,    
             
             UNIQUE(user_id, subject)
         )
@@ -237,7 +239,7 @@ def get_or_create_progress(user_id, subject):
     conn.close()
     return progress
 
-def update_progress(user_id, subject, irt_theta_initial=None, irt_theta_final=None, status=None, score=None):
+def update_progress(user_id, subject, irt_theta_initial=None, irt_theta_final=None, status=None, score=None, final_assessment_attempts=None):
     conn = get_db_connection()
     cur = conn.cursor()
     
@@ -257,6 +259,9 @@ def update_progress(user_id, subject, irt_theta_initial=None, irt_theta_final=No
     if score is not None:
         query_parts.append("assignment_score = %s")
         params.append(score)
+    if final_assessment_attempts is not None: 
+        query_parts.append("final_assessment_attempts = %s")
+        params.append(final_assessment_attempts)
         
     if not query_parts:
         return
