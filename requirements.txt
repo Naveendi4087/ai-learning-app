@@ -6,4 +6,4 @@ google-generativeai
 numpy
 pandas
 plotly
-catsim
+catsim==0.17.3

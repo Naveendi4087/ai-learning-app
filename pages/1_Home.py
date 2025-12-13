@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 from modules import db, helpers
 
@@ -6,9 +7,11 @@ helpers.set_page_styling()
 helpers.hide_sidebar()
 
 st.set_page_config(page_title="Home", page_icon="🏠", layout="centered")
+FEEDBACK_LINK = os.getenv("FEEDBACK_LINK")
 
 # --- CSS STYLING ---
-st.markdown("""
+st.markdown(
+    """
 <style>
     /* 1. SUBJECT CARDS (Secondary Buttons) */
     div.stButton > button[kind="secondary"] {
@@ -100,7 +103,7 @@ st.markdown("""
 }
 </style>
 
-<a href="https://docs.google.com/forms/d/1ZLHisQxPiJCQrSMJAch9jRytGb_A8o2CJA2u3hcTObM/edit#responses"
+<a href="{FEEDBACK_LINK}"
    target="_blank"
    class="feedback-banner"
    role="button"
@@ -108,7 +111,9 @@ st.markdown("""
    📝 Give Feedback
 </a>
 </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 if 'user_id' not in st.session_state:
     st.page_link("pages/0_Login.py", label="Go to Login", icon="🔑")
