@@ -55,6 +55,58 @@ st.markdown("""
         transform: none;
         box-shadow: none;
     }
+   /* REMOVE LINK NATURE COMPLETELY */
+.feedback-banner,
+.feedback-banner:link,
+.feedback-banner:visited,
+.feedback-banner:hover,
+.feedback-banner:active {
+    text-decoration: none !important;
+    color: #ffffff !important;
+    outline: none !important;
+}
+
+/* BOTTOM CENTER FEEDBACK BUTTON */
+.feedback-banner {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ff5722;
+    padding: 14px 30px;
+    border-radius: 30px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+    z-index: 99999;
+    cursor: pointer;
+    animation: pulse 1.8s infinite;
+}
+
+/* Hover Effect */
+.feedback-banner:hover {
+    background: #e64a19;
+    transform: translateX(-50%) scale(1.05);
+}
+
+/* Pulse Animation */
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255,87,34,0.7); }
+    70% { box-shadow: 0 0 0 18px rgba(255,87,34,0); }
+    100% { box-shadow: 0 0 0 0 rgba(255,87,34,0); }
+}
+</style>
+
+<a href="https://docs.google.com/forms/d/1ZLHisQxPiJCQrSMJAch9jRytGb_A8o2CJA2u3hcTObM/edit#responses"
+   target="_blank"
+   class="feedback-banner"
+   role="button"
+   aria-label="Give Feedback">
+   📝 Give Feedback
+</a>
 </style>
 """, unsafe_allow_html=True)
 
