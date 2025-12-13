@@ -15,7 +15,7 @@ if 'user_id' not in st.session_state or 'selected_subject' not in st.session_sta
 
 subject = st.session_state['selected_subject']
 user_id = st.session_state['user_id']
-st.title(f"🏆 Final Assessment for {subject}")
+st.title(f"Final Assessment for {subject}")
 
 # --- PROGRESS & ATTEMPT CHECK ---
 progress = db.get_or_create_progress(user_id, subject)
@@ -31,7 +31,8 @@ if progress['status'] == 'completed':
     st.metric(label="Your Final Proficiency Level", value=f"{final_level}")
     st.markdown(f"**Learning Gain:** You improved from a **{initial_level}** to a **{final_level}** proficiency level. Keep up the great work!")
 
-    st.page_link("pages/5_Profile.py", label="View Your Profile", icon="👤")
+    if st.button("View Your Profile", type="secondary"):
+        st.switch_page("pages/5_Profile.py")
     st.stop()
 
 # Get mastery status for locking retries

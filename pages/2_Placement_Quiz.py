@@ -32,6 +32,7 @@ def get_ability_level(theta):
 
 # Check if quiz is already completed
 if progress['irt_theta_initial'] is not None:
+    st.title(f"{subject} Placement Quiz")
     st.info("You have already completed the placement quiz.")
     
     # Display level based on existing score
@@ -41,10 +42,11 @@ if progress['irt_theta_initial'] is not None:
     # MODIFICATION 1: Remove Theta from st.metric delta
     st.metric("Your Starting Knowledge Level", level) 
     
-    st.page_link("pages/3_Learning_Path.py", label="Continue Your Learning Path", icon="📚")
+    if st.button("Continue Your Learning Path", type="primary"):
+        st.switch_page("pages/3_Learning_Path.py")
     st.stop()
 
-st.title(f"🧠 {subject} Placement Quiz")
+st.title(f"{subject} Placement Quiz")
 st.write("This adaptive quiz will precisely measure your starting knowledge. It adapts to your skill level, so don't worry if questions seem to get harder or easier.")
 
 # --- CAT SIMULATOR INITIALIZATION ---
@@ -176,7 +178,7 @@ else:
     # *** Display proficiency level***
     st.metric("Your Starting Knowledge Level", level)
     
-    with st.spinner("Seeding your personalized 'Student Brain' (BKT Model)..."):
+    with st.spinner("Creating your personalized Student Brain"):
         # The "Psychometric Hand-off"
         initial_prob_knows = psychometrics.map_theta_to_bkt_prior(final_theta)
         
@@ -192,7 +194,7 @@ else:
             st.session_state.current_topic_id = path[0]['id']
             
     st.info(f"We've analyzed your results and set your initial knowledge profile. You are assessed as **{level}** with a starting mastery probability of {initial_prob_knows*100:.0f}%.")
-    st.page_link("pages/3_Learning_Path.py", label="Start Your Learning Path!", icon="🚀")
+    st.page_link("pages/3_Learning_Path.py", label="Start Your Learning Path!")
     
     # Clean up session state
     keys_to_delete = [k for k in st.session_state if k.startswith('cat_')]

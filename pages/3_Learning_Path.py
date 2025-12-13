@@ -76,13 +76,13 @@ current_viewing_index = topic_ids.index(viewing_id)
 st.sidebar.header("Course Outline")
 
 # --- ICON LEGEND ---
-with st.sidebar.expander("ℹ️ Icon Legend", expanded=False):
-    st.markdown("""
-- 🔒 : **Locked** (Complete previous topic first)
-- 📖 : **Unlocked** (Ready to learn)
-- ▶️ : **Current** (You are here)
-- ✅ : **Fully Mastered** (Score > 95%)
-""")
+#with st.sidebar.expander("ℹ️ Icon Legend", expanded=False):
+#    st.markdown("""
+#- 🔒 : **Locked** (Complete previous topic first)
+#- 📖 : **Unlocked** (Ready to learn)
+#- ▶️ : **Current** (You are here)
+#- ✅ : **Fully Mastered** (Score > 95%)
+#""")
 # -----------------------
 
 for topic_record in learning_path:
@@ -370,7 +370,7 @@ elif topic_state == 'failed_quiz':
                 db.apply_learning(user_id, subject, viewing_id)
 
     st.markdown("---")
-    if st.button("✅ I'm ready to try the quiz again", type="primary", use_container_width=True):
+    if st.button("I'm ready to try the quiz again", type="primary", use_container_width=True):
         bdi_state_key = BDI_STATE 
         
         keys_to_clear = [k for k in st.session_state.keys() if k.startswith(f"bdi_{viewing_id}_") and k != bdi_state_key]
@@ -546,7 +546,7 @@ elif topic_state == 'coding_challenge':
 
     user_code = st.text_area("Your Solution:", value=default_code, height=250, key="code_area")
 
-    if st.button("Submit Solution 🚀", type="primary"):
+    if st.button("Submit Solution", type="primary"):
         if len(user_code) < 10:
             st.warning("Please write some code first!")
         else:
@@ -580,19 +580,21 @@ elif topic_state == 'coding_challenge':
 
                 st.session_state[CODING_FEEDBACK_KEY] = grade_data
 
-    # 4. Display Feedback & Handle Progression
-    if CODING_FEEDBACK_KEY in st.session_state:
-        feedback = st.session_state[CODING_FEEDBACK_KEY]
+    # In pages/3_Learning_Path.py (Starting around line 825)
+
+# 4. Display Feedback & Handle Progression
+if CODING_FEEDBACK_KEY in st.session_state:
+    feedback = st.session_state[CODING_FEEDBACK_KEY]
+    
+    if feedback['is_correct']:
+        # *** 1. CORRECT SUBMISSION: Display Success and the Continue Button ***
+        st.balloons() 
+        st.success("🎉 **Topic Mastery Achieved!**") 
+        st.write(f"**Feedback:** {feedback['feedback']}")
+        st.info("You have demonstrated mastery of this topic. Click 'Continue' to move on.")
         
-        if feedback['is_correct']:
-            # *** DISPLAY SUCCESS FEEDBACK IMMEDIATELY ***
-            st.balloons() 
-            st.success("🎉 **Topic Mastery Achieved!**") 
-            st.write(f"**Feedback:** {feedback['feedback']}")
-            st.info("You have demonstrated mastery of this topic. Click 'Continue' to move on.")
-            
-        # --- NAVIGATION BUTTON ---
-        if st.button("Continue to Next Topic ➡️", type="primary"):
+        # --- NAVIGATION BUTTON (ONLY APPEARS IF CORRECT) ---
+        if st.button("Continue to Next Topic", type="primary"):
             
             # --- MASTERY MOMENT: Update BKT before checking global mastery ---
             if not is_topic_mastered:
@@ -609,7 +611,6 @@ elif topic_state == 'coding_challenge':
                 # Case B: Last topic in the sequence. Check Global Mastery.
                 
                 # --- GLOBAL MASTERY CHECK ---
-                # Get the latest BKT models (Crucial: Use fresh data after the current topic update)
                 all_bkt_data_after_update = db.get_all_bkt_models_for_subject(user_id, subject)
                 all_mastered = all(model['prob_knows'] >= 0.95 for model in all_bkt_data_after_update)
                 
@@ -643,13 +644,13 @@ elif topic_state == 'coding_challenge':
                 if k in st.session_state:
                     del st.session_state[k]
             st.rerun()
-        else:
-            # --- INCORRECT SUBMISSION FEEDBACK ---
-            st.error("Not quite right yet.")
-            st.write(f"**Feedback:** {feedback['feedback']}")
-            st.info("Read the feedback, edit your code above, and submit again!")
-            db.log_learning_event(user_id, subject, viewing_id, "coding_fail", json.dumps({"feedback": feedback['feedback']}))
-
+            
+    else:
+        # *** 2. INCORRECT SUBMISSION: Display Error and Instruction, NO Button ***
+        st.error("Not quite right yet.")
+        st.write(f"**Feedback:** {feedback['feedback']}")
+        st.info("Read the feedback, edit your code above, and submit again!")
+        db.log_learning_event(user_id, subject, viewing_id, "coding_fail", json.dumps({"feedback": feedback['feedback']}))
 # --- AI Tutor Chat (Always at the bottom) ---
 st.markdown("---")
 st.header("💬 AI Tutor Chat")

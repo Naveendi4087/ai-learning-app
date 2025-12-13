@@ -83,13 +83,13 @@ with right_col:
         with col_text:
             st.markdown("<p style='text-align: right; margin-top: 10px;'>Don't have an account?</p>", unsafe_allow_html=True)
         with col_btn:
-            if st.button("🚀 Sign Up", key="switch-to-signup", type="secondary"):
+            if st.button("Sign Up", key="switch-to-signup", type="secondary"):
                 st.session_state.form_view = 'signup'
                 st.rerun()
 
     # --- SIGNUP VIEW ---
     else:
-        st.title("Create Your Account 🚀")
+        st.title("Create Your Account")
 
         with st.form("signup_form"):
             new_username = st.text_input("Choose a Username", placeholder="Create a unique username")
@@ -112,6 +112,6 @@ with right_col:
         with col_text:
             st.markdown("<p style='text-align: right; margin-top: 10px;'>Already have an account?</p>", unsafe_allow_html=True)
         with col_btn:
-            if st.button("👋 Login", key="switch-to-login", type="secondary"):
+            if st.button("Login", key="switch-to-login", type="secondary"):
                 st.session_state.form_view = 'login'
                 st.rerun()
