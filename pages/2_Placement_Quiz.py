@@ -57,9 +57,8 @@ if 'cat_simulator' not in st.session_state:
         if item_bank is None or len(item_bank) == 0:
             st.error("No question bank found. Cannot start quiz.")
             st.stop()
-            
-        # ***  Change test length to match available items ***
-        TEST_LENGTH = 10 # Changed from 10 to 4
+
+        TEST_LENGTH = 10 # Number of items in the placement quiz
         
         if len(item_bank) < TEST_LENGTH:
             st.error(f"Not enough items in bank ({len(item_bank)}) to run a {TEST_LENGTH}-item test.")
@@ -109,8 +108,6 @@ if not test_is_complete:
     item_sim_index = st.session_state.cat_current_item_index
     item_data = item_map[item_sim_index]
     
-    # Display the Topic Name (Need topic mapping if displaying name)
-    # For now, keep Topic ID, but a database join/lookup is needed for the name.
     #st.markdown(f"**Topic ID:** {item_data['topic_id']}") 
     st.markdown(item_data['question_text'])
     

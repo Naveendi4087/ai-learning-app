@@ -248,41 +248,32 @@ with tab1:
 
             st.markdown("<div class='card-spacer'></div>", unsafe_allow_html=True)
 
-            # 5. Action Footer
-            foot_c1, foot_c2 = st.columns([4, 1])
-            
-            with foot_c1:
-                with st.expander("📊 View Topic Details"):
-                    if isinstance(mastery_data, list):
-                        df = pd.DataFrame(mastery_data)
-                        if 'prob_knows' in df.columns:
-                            df['prob_knows_percent'] = (df['prob_knows'] * 100).round(0)
-                            df['color'] = df['prob_knows'].apply(get_mastery_color)
-                            
-                            fig = go.Figure(go.Bar(
-                                x=df['prob_knows'],
-                                y=df['topic_name'],
-                                orientation='h',
-                                marker_color=df['color'],
-                                text=df['prob_knows_percent'].astype(str) + '%',
-                                textposition='auto',
-                                marker_cornerradius=5
-                            ))
-                            fig.update_layout(
-                                margin=dict(l=0, r=0, t=0, b=0),
-                                height=300,
-                                xaxis=dict(showgrid=False, showticklabels=False),
-                                yaxis=dict(showgrid=False),
-                                plot_bgcolor='rgba(0,0,0,0)',
-                                paper_bgcolor='rgba(0,0,0,0)'
-                            )
-                            st.plotly_chart(fig, use_container_width=True)
-            
-            with foot_c2:
-                 if p['status'] == 'completed':
-                     st.button("Review Course", key=f"rev_{subject}", use_container_width=True)
-                 else:
-                     st.button("Continue Learning 🚀", key=f"cont_{subject}", type="primary", use_container_width=True, on_click=lambda s=subject: st.session_state.update(selected_subject=s) or st.switch_page("pages/3_Learning_Path.py"))
+            # 5. Topic Details Expander (without action buttons)
+            with st.expander("📊 View Topic Details"):
+                if isinstance(mastery_data, list):
+                    df = pd.DataFrame(mastery_data)
+                    if 'prob_knows' in df.columns:
+                        df['prob_knows_percent'] = (df['prob_knows'] * 100).round(0)
+                        df['color'] = df['prob_knows'].apply(get_mastery_color)
+                        
+                        fig = go.Figure(go.Bar(
+                            x=df['prob_knows'],
+                            y=df['topic_name'],
+                            orientation='h',
+                            marker_color=df['color'],
+                            text=df['prob_knows_percent'].astype(str) + '%',
+                            textposition='auto',
+                            marker_cornerradius=5
+                        ))
+                        fig.update_layout(
+                            margin=dict(l=0, r=0, t=0, b=0),
+                            height=300,
+                            xaxis=dict(showgrid=False, showticklabels=False),
+                            yaxis=dict(showgrid=False),
+                            plot_bgcolor='rgba(0,0,0,0)',
+                            paper_bgcolor='rgba(0,0,0,0)'
+                        )
+                        st.plotly_chart(fig, use_container_width=True)
 
 with tab2:
     st.subheader("Available Courses")

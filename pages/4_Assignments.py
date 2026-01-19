@@ -71,11 +71,11 @@ if 'cat_simulator_final' not in st.session_state:
     with st.spinner("Loading calibrated final exam..."):
         item_bank, item_map = psychometrics.get_irt_question_bank(subject, 'final')
         
-        if item_bank is None or len(item_bank) < 20:
+        if item_bank is None or len(item_bank) < 10:
             st.error("No final exam bank found or not enough items. Cannot start assessment.")
             st.stop()
             
-        TEST_LENGTH = 20 
+        TEST_LENGTH = 10 
 
         st.session_state.cat_simulator_final = psychometrics.initialize_cat_simulator(item_bank, TEST_LENGTH)
         st.session_state.cat_item_map_final = item_map
@@ -213,7 +213,7 @@ else:
         st.page_link("pages/5_Profile.py", label="View Your Profile")
     else:
         st.error(f"### Assessment Failed (Attempt {new_attempts}). Your score places you at the {final_level} level.")
-        st.warning(f"You need to reach the Intermediate Level or higher to pass.")
+        st.warning("You need to reach the Intermediate Level or higher to pass.")
         
         # Set status back to 'learning' so the user is forced to re-master topics
         db.update_progress(user_id, subject, irt_theta_final=final_theta, status='learning', final_assessment_attempts=new_attempts)
